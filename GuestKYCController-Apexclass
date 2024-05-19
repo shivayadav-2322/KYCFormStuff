@@ -1,0 +1,187 @@
+<!--Version 1-->
+
+public with sharing class GuestKYCFormController {
+    public Account account { get; set; }
+    public Contact contact { get; set; }
+    public Opportunity opportunity { get; set; }
+    public Supplier__c supplier { get; set; }
+   // public opportunity opportunity {get; set;}
+    public Boolean hasError { get; set; } 
+    public String errorMessages { get; set; }
+    public String successMessage { get; set; }
+    public Date myDate { get; set; }
+    
+    
+    public GuestKYCFormController(){
+        account = new Account();
+        contact = new Contact();
+        opportunity = new Opportunity();
+        supplier = new Supplier__c();
+        hasError = false; 
+    }
+    
+   public PageReference saveGuestKYC(){
+            if (checkRequiredFields()) {
+                Savepoint sp = Database.setSavepoint();
+                try {
+                    Account newAccount = new Account( Name = account.Name,
+                                                         Country__c = account.Country__c,
+                                                         Account_Category__c = account.Account_Category__c,
+                                                         Region__c = account.Region__c,
+                                                         City__c = account.City__c,
+                                                         Province__c = account.Province__c,
+                                                         Account_Category_Type__c = account.Account_Category_Type__c,
+                                                         Distribution_Utility__c = account.Distribution_Utility__c,
+                                                         Certificate_of_Contestability_Number__c = account.Certificate_of_Contestability_Number__c,
+                                                         SIN_Number__c = account.SIN_Number__c,
+                                                         Unit_Number_or_Floor__c = account.Unit_Number_or_Floor__c,
+                                                         Area__c = account.Area__c,
+                                                         Building_Name__c = account.Building_Name__c,
+                                                         Street__c = account.Street__c,
+                                                         Barangay__c = account.Barangay__c,
+                                                         	Industry = account.Industry);
+                    insert newAccount;
+                    
+                    Contact newContact = new Contact(FirstName = contact.FirstName,
+                                                         LastName = contact.LastName,
+                                                         Country__c = contact.Country__c,
+                                                         Position__c = contact.Position__c,
+                                                         Main_Contact__c = contact.Main_Contact__c,
+                                                         Billing_Recipient__c = contact.Billing_Recipient__c,
+                                                         OR_Recipient__c = contact.OR_Recipient__c,
+                                                         Authorized_Signatory__c = contact.Authorized_Signatory__c,
+                                                         Notices_Addressee__c = contact.Notices_Addressee__c,
+                                                         Department_2__c = contact.Department_2__c,
+                                                         Email = contact.Email,
+                                                         Phone = contact.Phone,
+                                                         MobilePhone = contact.MobilePhone,
+                                                         Unit_Number_or_Floor__c = contact.Unit_Number_or_Floor__c,
+                                                         Building_Name__c = contact.Building_Name__c,
+                                                         Street__c = contact.Street__c,
+                                                         Barangay__c = contact.Barangay__c,
+                                                         Area__c = contact.Area__c,
+                                                         Region__c = contact.Region__c,
+                                                         Province__c = contact.Province__c,
+                                                         City__c = contact.City__c,
+                                                      AccountId = newAccount.Id);
+                    insert newContact;
+                    Opportunity newOpportunity = new Opportunity(Name = opportunity.Name,
+                                                                  CloseDate = opportunity.CloseDate,
+                                                                  StageName = opportunity.StageName,
+                                                                  LeadSource = opportunity.LeadSource,
+                                                                  AccountId = newAccount.Id);
+                    insert newOpportunity;
+                    Supplier__c newSupplier = new Supplier__c(Name = supplier.Name,
+                                                               Account__c = newAccount.Id);
+                    insert newSupplier;
+                        PageReference successPage = new PageReference('/apex/successPage');
+                        successPage.getParameters().put('accountId', newAccount.Id);
+                        successPage.getParameters().put('contactId', newContact.Id);
+                        successPage.getParameters().put('opportunityId', newOpportunity.Id);
+                        successPage.getParameters().put('supplierId', newSupplier.Id);
+                        successPage.setRedirect(true);
+                    successMessage = 'Record saved successfully!';
+                    //PageReference successPage = new PageReference('/apex/successPage');
+                    //successPage.setRedirect(true);
+                    return successPage;
+                } catch (Exception e) {
+                    handleException(e, sp);
+                }
+            } else {
+                hasError = true; 
+                errorMessages = 'Please fill out all required fields. Missing fields: ' + getMissingFieldNames();
+            }
+            return null;
+        }
+
+
+    
+    private void handleException(Exception e, Savepoint sp) {
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, e.getMessage()));
+        errorMessages = 'Error: ' + e.getMessage();
+        Database.rollback(sp);
+        hasError = true; 
+    }
+    private String getMissingFieldNames() {
+        List<String> missingFields = new List<String>();
+        if (String.isBlank(account.Name)) missingFields.add('Corporate Name');
+        if (String.isBlank(account.Country__c)) missingFields.add('Country');
+        if (String.isBlank(account.Account_Category__c)) missingFields.add('Account Category');
+        if (String.isBlank(account.Account_Category_Type__c)) missingFields.add('Account Category Type');
+        if (opportunity.CloseDate == null) missingFields.add('Close Date');
+        if (String.isBlank(opportunity.StageName)) missingFields.add('Stage');
+        if (String.isBlank(account.Industry)) missingFields.add('Industry');
+        
+        if (String.isBlank(contact.FirstName)) missingFields.add('First Name');
+        if (String.isBlank(contact.LastName)) missingFields.add('Last Name');
+        if (String.isBlank(contact.Position__c)) missingFields.add('Position');
+        if (String.isBlank(contact.Department_2__c)) missingFields.add('Department');
+        if (String.isBlank(contact.Email)) missingFields.add('Email Address');
+        if (String.isBlank(contact.Phone)) missingFields.add('Landline Number');
+        if (String.isBlank(contact.MobilePhone)) missingFields.add('Mobile Number');
+        
+        if (opportunity.CloseDate == null || 
+            String.isBlank(opportunity.StageName) || 
+            String.isBlank(opportunity.LeadSource) || 
+            String.isBlank(opportunity.Name)) {
+            
+            missingFields.add('Close Date');
+            missingFields.add('Stage');
+            missingFields.add('Lead Source');
+            missingFields.add('Opportunity Name');
+        }
+        
+        if (String.isBlank(supplier.Name)) missingFields.add('Incumbent RES');
+   
+        return String.join(missingFields, ', ');
+    }
+    
+    private Boolean checkRequiredFields() {
+        Boolean isValid = true;
+        
+        if (String.isBlank(account.Name) ||
+            String.isBlank(account.Country__c) ||
+            String.isBlank(account.Account_Category__c) ||
+            String.isBlank(account.Account_Category_Type__c) ||
+            opportunity.CloseDate == null ||
+            String.isBlank(opportunity.StageName) ||
+            String.isBlank(account.Industry)) {
+            
+            isValid = false;
+        }
+        
+        if (String.isBlank(contact.FirstName) ||
+            String.isBlank(contact.LastName) ||
+            //String.isBlank(contact.Position__c) ||
+            //String.isBlank(contact.Department_2__c) ||
+            String.isBlank(contact.Email) 
+            //String.isBlank(contact.Phone) ||
+            //String.isBlank(contact.MobilePhone)
+             ) {
+            
+            isValid = false;
+        }
+        
+        if (String.isBlank(opportunity.Name) ||
+            String.isBlank(opportunity.StageName) ||
+            String.isBlank(opportunity.LeadSource)) {
+            
+            isValid = false;
+        }
+        
+        if (String.isBlank(supplier.Name)) {
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Please fill out all required fields. Missing fields: ' + getMissingFieldNames()));
+        } 
+        
+        return isValid;
+    } /*
+	 private Boolean checkRequiredFields() {
+        Boolean isValid = true;
+            return isValid;
+    }*/
+   
+}
