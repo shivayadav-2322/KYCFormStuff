@@ -1,0 +1,52 @@
+<!--Version 1-->
+
+public with sharing class GuestKYCFormSuccessController {
+    public Account account { get; set; }
+    public Contact contact { get; set; }
+    public Opportunity opportunity { get; set; }
+    public Supplier__c supplier { get; set; }
+    public String successMessage { get; set; }
+
+    public GuestKYCFormSuccessController() {
+        String accountId = ApexPages.currentPage().getParameters().get('accountId');
+        String contactId = ApexPages.currentPage().getParameters().get('contactId');
+        String opportunityId = ApexPages.currentPage().getParameters().get('opportunityId');
+        String supplierId = ApexPages.currentPage().getParameters().get('supplierId');
+        if (accountId != null) {
+            account = [SELECT Id, Name, Country__c, Account_Category__c,Region__c,City__c, Province__c,Account_Category_Type__c,Distribution_Utility__c,Certificate_of_Contestability_Number__c,SIN_Number__c,Unit_Number_or_Floor__c,Area__c,Building_Name__c,Street__c,Barangay__c, Industry FROM Account WHERE Id = :accountId LIMIT 1];
+        }
+        if (contactId != null) {
+            contact = [SELECT Id, FirstName, LastName,Country__c, Position__c,Main_Contact__c,Billing_Recipient__c,OR_Recipient__c,Authorized_Signatory__c,Notices_Addressee__c, Department_2__c, Email, Phone, MobilePhone,Unit_Number_or_Floor__c,Building_Name__c,Street__c,Barangay__c,Area__c,Region__c,Province__c,City__c FROM Contact WHERE Id = :contactId LIMIT 1];
+        }
+        if (opportunityId != null) {
+            opportunity = [SELECT Id, Name, CloseDate, StageName, LeadSource FROM Opportunity WHERE Id = :opportunityId LIMIT 1];
+        }
+        if (supplierId != null) {
+            supplier = [SELECT Id, Name FROM Supplier__c WHERE Id = :supplierId LIMIT 1];
+        }
+    }
+    
+    public PageReference generatePDF() {
+        try {
+            PageReference pdfPage = Page.SuccessPage; 
+            pdfPage.getParameters().put('accountId', account.Id);
+            pdfPage.getParameters().put('contactId', contact.Id);
+            pdfPage.getParameters().put('opportunityId', opportunity.Id);
+            pdfPage.getParameters().put('supplierId', supplier.Id);
+            pdfPage.setRedirect(true);
+    		    Blob pdfBlob = pdfPage.getContentAsPDF();
+    		String fileName = 'KYC_Form.pdf'; 
+            Attachment attachment = new Attachment();
+            attachment.Body = pdfBlob;
+            attachment.Name = fileName;
+            attachment.ParentId = account.Id; 
+            insert attachment;
+    		PageReference successPage = new PageReference('/apex/SuccessPage'); 
+            successPage.setRedirect(true);
+            return successPage;
+        } catch (Exception e) {
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Error generating PDF: ' + e.getMessage()));
+            return null;
+        }
+    }
+}
