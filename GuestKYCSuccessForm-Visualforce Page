@@ -1,0 +1,491 @@
+<!--Version 1-->
+
+<apex:page controller="GuestKYCFormSuccessController" standardStylesheets="false" showHeader="false" sidebar="false">
+   <apex:includeScript value="https://code.jquery.com/jquery-3.6.0.min.js"/>
+    <apex:includeScript value="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"/>
+    <apex:stylesheet value="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+    <apex:includeScript value="https://code.jquery.com/ui/1.12.1/jquery-ui.js"/>
+    <apex:stylesheet value="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+    <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid black;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+        }
+
+        .grid-item {
+            padding: 04px;
+            font-size: 17px;
+        }
+
+        p td {
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        .grid-container1 {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            padding-left: 90px;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        .warning-symbol {
+            color: red;
+            font-weight: bold;
+        }
+       /* Style for the date field container */
+        .date-field {
+            position: relative;
+        }
+        
+        /* Style for the calendar icon */
+        .calendar-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px; /* Adjust the positioning as needed */
+            transform: translateY(-50%);
+            width: 24px; /* Adjust the size as needed */
+            height: 24px;
+            background-image: url('path/to/calendar-icon.png'); /* Replace 'path/to/calendar-icon.png' with the path to your calendar icon image */
+            background-size: cover;
+            cursor: pointer;
+        }
+	</style>
+      <style>
+        .success-message {
+            color: #008000; /* Green color */
+            font-weight: bold; /* Bold text */
+            font-size: 38px; /* Font size */
+            text-align: center; /* Center align text */
+            padding: 20px; /* Padding */
+        }
+    </style>
+
+<apex:form id="guestKYCForm"> 
+     <div id="successMessage" style="display: none; text-align: center; background-color: #00FF00; color: #000000; padding: 10px; font-weight: bold;">
+       	Your record has been successfully submitted in Salesforce.!
+    </div>
+    <apex:sectionHeader title="CUSTOMER INFORMATION"/>
+    <apex:pagemessages />
+    <table>
+      <tr>
+       <td colspan="2">
+           <apex:outputLabel value="Corporate Name(ALL CAPS)" for="accountName"/> 
+           <apex:outputField value="{!Account.Name}" id="accountName" styleClass="uppercase-input"/> 
+          </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight: bold;">
+              <p>Main Office Address:</p>
+           </div>
+         
+          <div class="grid-container">
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Unit Number or Floor" for="af"/> <br/>
+                    <apex:outputField value="{!Account.Unit_Number_or_Floor__c}" id="af"/>
+                 </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Building Name" for="accountBuild"/> <br/>
+                    <apex:outputField value="{!Account.Building_Name__c}" id="accountBuild"/>
+                </div> 
+                  
+                <div class="grid-item">
+                  <apex:outputLabel value="Street" for="accountstreet"/> <br/>
+                    <apex:outputField value="{!Account.Street__c}" id="accountstreet"/>
+                </div> 
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Barangay" for="accountbarangay"/> <br/>
+                    <apex:outputField value="{!Account.Barangay__c}" id="accountbarangay"/>
+                  </div> 
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Area" for="accountarea"/> <br/>
+                    <apex:outputField value="{!Account.Area__c}" id="accountarea"/>
+                </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Region" for="accountregion"/> <br/>
+                    <apex:outputField value="{!Account.Region__c}" id="accountregion"/>
+                  </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Province" for="accountprovince"/> <br/>
+                    <apex:outputField value="{!Account.Province__c}" id="accountprovince"/>
+                  </div>
+                  
+                <div class="grid-item">
+                   <apex:outputLabel value="City/Municipality" for="accountcity"/> <br/>
+                    <apex:outputField value="{!Account.City__c}" id="accountcity"/>
+                </div>
+          </div>
+        </td>
+
+        <td></td>
+      </tr>
+
+      <tr>
+        <td>
+            <div style= "font-weight: bold;">
+                <p>Facility Address:</p>
+            </div>
+            
+          <div class="grid-container">
+                  
+                <div class="grid-item">
+                   <apex:outputLabel value="Unit Number or Floor" for="contactfloor"/> <br/>
+                   <apex:outputField value="{!contact.Unit_Number_or_Floor__c}" id="contactfloor"/>
+                 </div>
+                  
+                <div class="grid-item">
+                  <apex:outputLabel value="Building Name" for="contactBuild"/> <br/>
+                  <apex:outputField value="{!contact.Building_Name__c}" id="contactBuild"/>
+                </div>
+                  
+                <div class="grid-item">
+                  <apex:outputLabel value="Street" for="contactstreet"/> <br/>
+                  <apex:outputField value="{!contact.Street__c}" id="contactstreet"/>
+                </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Barangay" for="contactbarangay"/> <br/>
+                    <apex:outputField value="{!contact.Barangay__c}" id="contactbarangay"/>
+                </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Area" for="contactarea"/> <br/>
+                    <apex:outputField value="{!contact.Area__c}" id="contactarea"/>
+                </div>
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Region" for="contactregionpc"/> <br/>
+                    <apex:outputField value="{!contact.Region__c}" id="contactregion"/>
+                </div> 
+                  
+                <div class="grid-item">
+                    <apex:outputLabel value="Province" for="contactprovince"/> <br/>
+                    <apex:outputField value="{!contact.Province__c}" id="contactprovince"/>
+                </div>
+                  
+                <div class="grid-item">
+                   <apex:outputLabel value="City/Municipality" for="contactcity"/> <br/>
+                   <apex:outputField value="{!contact.City__c}" id="contactcity"/>
+                </div>
+          </div>
+        </td>
+    
+          <td>
+              <apex:outputLabel value="CCon Number[ex. 2018-MRLCO-1234]" for="accountccon"/><br/>
+              <apex:outputField value="{!Account.Certificate_of_Contestability_Number__c}" id="accountccon"/>
+              <br/><br/><br/>
+              <apex:outputLabel value="SIN Number" for="accountsin"/><br/>
+              <apex:outputField value="{!Account.SIN_Number__c}" id="accountsin"/>
+          </td>
+      </tr>
+
+      <tr>
+        <td>
+            <div class="grid-container">
+                
+                <div class="grid-item">
+                  <apex:outputLabel value="Distribution Utility" for="accountdistributon"/><br/>
+                  <apex:outputField value="{!Account.Distribution_Utility__c}" id="accountdistribution"/>
+                </div>
+                
+                <div class="grid-item">
+                  <apex:outputLabel value="Industry" for="accountindustry"/><br/>
+                  <apex:outputField value="{!Account.Industry}" id="accountindustry"/>
+                </div> <br/>
+          </div>
+       </td>
+        
+          <td>
+            <apex:outputLabel value="Incumbent RES" for="suppliername"/><br/>
+            <apex:outputField value="{!supplier.Name}" id="suppliername"/>
+          </td>
+      </tr>
+
+        <tr>
+        	<td colspan="5"><h1>Contact Person</h1></td>
+        </tr>
+        
+      <tr>
+        <td colspan="5">
+          
+          <div class="grid-container1">
+              
+            <div class="grid-item">
+              <apex:outputLabel value="First Name(ALL CAPS)" for="contactfname"/><br/>
+              <apex:outputField value="{!contact.FirstName}" id="contactfname" styleClass="uppercase-input"/>
+            </div>
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Last Name(ALL CAPS)" for="contactlname"/><br/>
+              <apex:outputField value="{!contact.LastName}" id="contactlname" styleClass="uppercase-input"/>
+            </div> 
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Position" for="contactposition"/><br/>
+              <apex:outputField value="{!contact.Position__c}" id="contactposition"/>
+            </div><br/>
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Department" for="contactdept"/><br/>
+              <apex:outputField value="{!contact.Department_2__c}" id="contactdept"/>
+            </div> 
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Email Address" for="contactemail"/><br/>
+              <apex:outputField value="{!contact.Email}" id="contactemail"/>
+            </div>
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Landline Number(format: 63xxxxxxxxx)" for="contactlandline"/><br/>
+              <apex:outputField value="{!contact.Phone}" id="contactlandline"/>
+            </div><br/>
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Mobile Number(format: 63xxxxxxxxxx)" for="contactmobile"/><br/>
+              <apex:outputField value="{!contact.MobilePhone}" id="contactmobile"/>
+            </div>
+              
+            <div class="grid-item">
+              <apex:outputLabel value="Main Contact (SPOC)" for="contactmain"/><br/>
+              <apex:outputField value="{!contact.Main_Contact__c}" id="contactmain"/>
+            </div>
+              
+             <div class="grid-item">
+                <apex:outputLabel value="Billing Recipient" for="contactbilling"/><br/>
+                <apex:outputField value="{!contact.Billing_Recipient__c}" id="contactbilling"/>
+             </div><br/>
+              
+              <div class="grid-item">
+                <apex:outputLabel value="Office Recipient" for="contactof"/><br/>
+                <apex:outputField value="{!contact.OR_Recipient__c}" id="contactof"/>
+             </div>
+              
+              <div class="grid-item">
+                <apex:outputLabel value="Authorized Signatory" for="contactauthorize"/><br/>
+                <apex:outputField value="{!contact.Authorized_Signatory__c}" id="contactauthorize"/>
+              </div>
+              
+               <div class="grid-item">
+                <apex:outputLabel value="Notices Addressee" for="contactnoticeaddress"/><br/>
+                <apex:outputField value="{!contact.Notices_Addressee__c}" id="contactnoticeaddress"/>
+              </div>   
+          </div>
+        </td>
+      </tr>
+        
+        <tr>
+        	<td colspan="3">
+                <div style= "font-weight: bold; text-align: center; font-size: 20px;">
+                	<p>Required Fields</p>
+            	</div>
+                          
+            	<div class="grid-container1">
+                	<div class="grid-item">
+                    	<apex:outputLabel value="Account Category" for="accountcategory"/><br/>
+                		<apex:outputField value="{!account.Account_Category__c}" id="accountcategory"/>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <apex:outputLabel value="Account Category Type" for="accountcategorytype"/><br/>
+                        <apex:outputField value="{!account.Account_Category_Type__c}" id="accountcategorytype"/>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <apex:outputLabel value="Country" for="accountcountry"/><br/>
+                        <apex:outputField value="{!account.Country__c}" id="accountcountry"/>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <apex:outputLabel value="Contact Country" for="contactcountry"/><br/>
+                        <apex:outputField value="{!contact.Country__c}" id="contactcountry"/>
+                    </div>
+                    
+                   <!-- <div class="grid-item">
+                        <apex:outputLabel value="Close Date" for="opportunityclosedate"/><br/>
+                        <apex:outputField value="{!opportunity.CloseDate}" id="opportunityclosedate"/> 
+						<apex:outputLabel value="Close Date" for="opportunityclosedate"/><br/>
+    					<apex:outputField value="{!opportunity.CloseDate}" id="opportunityclosedate" type="date"/>
+                    </div> -->
+                     <!-- Replace the outputField for CloseDate with an HTML input field -->
+                   <!-- <div class="grid-item">
+                        <label for="opportunityclosedate">Close Date</label><br/>
+                        <input type="date" id="opportunityclosedate" value="{!opportunityInfo.CloseDate}"/> 
+                         <apex:outputLabel value="Close Date" for="closeDateInput"/><br/>
+                        <apex:inputText id="closeDateInput" value="{!opportunityInfo.CloseDate}" styleClass="datepicker"/>
+                    </div>-->
+                    <div class="grid-item">
+    					<apex:outputLabel value="Close Date" for="closeDateInput"/><br/>
+    					<apex:outputField value="{!opportunity.CloseDate}" id="closeDateInput" styleClass="datepicker"/>
+					</div>
+                     <div class="grid-item">
+                        <apex:outputLabel value="Stage" for="opportunitystage"/><br/>
+                        <apex:outputField value="{!opportunity.StageName}" id="opportunitystage"/>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <apex:outputLabel value="Lead Source" for="opportunityleadsource"/><br/>
+                        <apex:outputField value="{!opportunity.LeadSource}" id="opportunityleadsource"/>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <apex:outputLabel value="Opportunity Name" for="opportunityname"/><br/>
+                        <apex:outputField value="{!opportunity.Name}" id="opportunityname"/>
+                    </div>
+                   
+                </div>
+            </td>
+        </tr>
+    </table>
+       <!--  <apex:pageBlock >
+        <div class="slds-m-top_medium slds-text-align_center">
+        <apex:commandButton action="{!generatePDF}" value="Save Page as PDF" styleClass="slds-button slds-button_brand"/>
+        </div>
+    </apex:pageBlock> -->
+
+      <!--
+      <apex:pageBlock>
+        <apex:pageBlockButtons location="bottom">
+            <apex:commandButton action="{!saveGuestKYC}" value="Save" rerender="guestKYCForm" styleClass="slds-button slds-button_brand"/>
+            <apex:commandButton onclick="closeWindow();" value="Cancel" styleClass="slds-button slds-button_brand"/>
+        </apex:pageBlockButtons>
+    </apex:pageBlock> -->
+ <!-- Buttons for Save and Cancel -->
+        <!-- <apex:pageBlock >
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton action="{!saveGuestKYC}" value="Save" rerender="guestKYCForm" immediate="true"/>
+                <apex:commandButton onclick="closeWindow();" value="Cancel" immediate="true"/>
+               <apex:commandButton action="{!debugValues}" value="Debug Values" rerender="errorSuccessMessages"/> 
+            </apex:pageBlockButtons>
+        </apex:pageBlock>-->
+		
+
+       </apex:form>
+
+    <!-- Script for closing window -->
+    <script>
+        j$ = jQuery.noConflict();
+        j$(document).ready(function(){
+            j$('.datepicker').datepicker({
+                //dateFormat: 'yy-mm-dd',
+                dateFormat: 'mm/dd/yy',
+            });
+    	j$('.calendar-icon').click(function() {
+                j$(this).prev('.datepicker').val('TODAY');
+                j$(this).prev('.datepicker').datepicker('show');
+            });
+            j$('.datepicker').on('change', function() {
+                if (j$(this).val() === 'TODAY') {
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+                    var yyyy = today.getFullYear();
+    
+                    today = yyyy + '-' + mm + '-' + dd;
+                    j$(this).val(today);
+                }
+            });
+        });
+    </script>
+      <script>
+        // Function to display the success message for 10 seconds
+        function displaySuccessMessage() {
+            // Show the success message
+            var successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+
+            // Set a timeout to hide the success message after 10 seconds
+            setTimeout(function() {
+                successMessage.style.display = 'none';
+            }, 30000); // 10000 milliseconds = 10 seconds
+        }
+
+        // Call the displaySuccessMessage function when the page loads
+        window.onload = function() {
+            displaySuccessMessage();
+        };
+    </script>
+
+
+    <!--Content About the Terms & Conditions-->
+
+   <div style="border: 2px solid black;">
+       <div style="text-align: center; margin: 20px; font-size: 17px; font-weight: bold;">
+            <h2>DATA PRIVACY AGREEMENT</h2>
+        </div>
+                
+       <div style="font-size: 18px; text-align: center;">
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We, at [Name of the Company] (“the Company”), understand the importance of your privacy and are committed to 
+                maintaining the confidentiality of your Personal Information and Sensitive Personal Information (collectively, “Personal Data”), 
+                pursuant to the provisions of the Data Privacy Act of 2012. Please be informed that all personal data collected which 
+                you provide in this Customer Information Sheet shall be used for future transactions and switching purposes. The same 
+                personal data shall be securely stored and retained in accordance with the policies/guidelines and systems of the Company.
+                <br/><br/>By signing below, you are hereby giving your consent to the processing of your Personal and Sensitive Personal Information in accordance with this Privacy Notice.
+            </p>
+         </div>
+            <br/><br/>   
+        
+       <div style="text-align: center; font-size: 17px; font-weight: bold;">
+                <h2>AFFIRMATION</h2>
+            </div>
+            
+       <div style="text-align:center; font-size:17px;">
+                <p>I/We affirm that each of the statements made in this application is true and correct and the signature(s) appearing herein is/are genuine.
+                </p>
+            </div>
+            
+       <br/><br/> <br/>
+       <div style="text-align: left; font-size: 17px; padding-left: 10px;">
+           <h3>List of Documents to Submit</h3>
+           <ol>
+               <li>Latest Mayor's Permit</li>
+               <li>BIR Certificate of Registration (Form 2303)</li>
+               <li>For Corporation, SEC Certificate of Registration and Aritcles of Incorporation (AOI)For Partnership, Certified Partnership Resolution or an SPA/affidavit stating the fact of the authorized representative’s authority to represent and bind the partnership.</li>
+               <li>Documents Showing Authority of the Signatory (Board Resolution or Secretary's Certificate) to sign, execute and deliver the Retail Electricity Supply Contract, attestations, and such other forms and documents.</li>
+               <li>Certification from BIR that customer is a withholding agent or if customer belongs to Top 20K Corporation/Large Taxpayer.</li>
+               <li> Proof of Contestability- CCon or DU bill with notice of contestability (RCOA) or DU bill with Notice of GEOP eligibility (GEOP).</li>
+               <li>Past 12 months' consumption (kWh) or copy of past 12 months' bill from their former RES (EDC, FGen)</li>
+               <li>PEZA Certification (in case customer is tax exempt) / VAT Certificate from PEZA</li>
+               <li>PEZA COR</li>
+               <li>Notarized Sworn Certification of % Export</li>
+           </ol>      
+       </div>
+    </div>
+</apex:page>
