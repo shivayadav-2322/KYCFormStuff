@@ -1,0 +1,82 @@
+<!--Main Version-->
+
+public with sharing class guestKYCformcontroller {
+
+    //Related a standard objects
+    public Account account {get; set; }
+    public Contact contact {get; set; }
+    public Opportunity opportunity {get; set; }
+    
+    
+    //Related a custom object
+    public Supplier__c supplier {get; set; }
+    public Customer_Information__c customerInfo {get; set; }
+    
+    public guestKYCformcontroller(){
+        // Initialize related standard objects
+        account = new Account();
+        contact = new Contact();
+        opportunity = new Opportunity();
+        
+        //Initialize related custom objects
+        supplier = new Supplier__c();
+        customerInfo = new Customer_Information__c();
+        
+
+    }
+    
+    public PageReference saveGuestKYC(){
+        Savepoint sp = Database.setSavepoint();
+        
+        try{
+            //Insert Account record with related custom object
+            
+            insert account;
+            System.debug('Account record is inserted : ' + account.Id);
+            customerInfo.Account__c = account.Id;
+            
+            //Insert Contact record with related custom object
+            
+            contact.AccountId = account.Id;
+            //contact.Supplier__c = supplier.Id;
+             insert contact;
+            System.debug('Contact Record is inserted : ' + contact.Id);
+            customerInfo.Contact__c = contact.Id;
+            
+            //Insert Opportunity record with related custom object
+             opportunity.AccountId = account.Id;
+            insert opportunity;
+            system.debug('Opportunity record is inserted :' + opportunity.Id);
+            customerInfo.Opportunity__c = opportunity.Id;
+            
+            //insert supplier record with related custom object
+          	//supplier.Account__c = account.Id;
+            insert supplier;
+            System.debug('Supplier record is inserted : ' + supplier.Id);
+            customerInfo.Supplier__c = supplier.Id;
+            
+            //Insert customer Information 
+            Insert customerInfo;
+            System.debug('Customer Information record is inserted : ' + customerInfo.Id);
+        }
+        
+        catch(DmlException e){
+            //ApexPages.addMessages(e);
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, e.getMessage()));
+            Database.rollback(sp);
+            return null;
+        }
+        
+        //Clear input data or refresh page
+       	account = new Account();
+        contact = new Contact();
+        opportunity = new Opportunity();
+        supplier = new Supplier__c();
+        customerInfo = new Customer_Information__c();
+        
+        // Optionally, add redirect logic after successful saving the record
+        return null;
+		
+    }
+    
+}
